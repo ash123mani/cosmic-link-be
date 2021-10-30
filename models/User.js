@@ -57,6 +57,16 @@ UserSchema.methods.getResetPasswordToken = function () {
   return resetToken
 }
 
+UserSchema.methods.toClient = function() {
+  const obj = this.toObject();
+
+  obj.id = obj._id;
+  delete obj._id;
+  delete obj.__v
+
+  return obj;
+}
+ 
 const User = mongoose.model("User", UserSchema);
 
 module.exports = User;

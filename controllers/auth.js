@@ -120,9 +120,10 @@ exports.resetpassword = async (req, res, next) => {
 
 const sendToken = async (user, statusCode, res) => {
   const token = await user.getSignedToken();
-  console.log("token", token);
+  const userData = await user.toClient()
   res.status(statusCode).json({
     success: true,
     token,
+    user: userData,
   });
 };
