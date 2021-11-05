@@ -25,6 +25,7 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  categories: Array,
 });
 
 UserSchema.pre("save", async function (next) {

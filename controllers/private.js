@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 
 const Link = require("../models/Link");
+const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 
 //get
 
 exports.addLink = async (req, res, next) => {
-  const {
+  let {
     user,
     body: { linkUrl, category, description },
   } = req;
@@ -21,6 +22,14 @@ exports.addLink = async (req, res, next) => {
   }
 
   try {
+    const userData = await User.findById(user._id)
+    category = category.toLowerCase();
+
+    if(!(userData.categories || []).includes(category)) {
+      userData.categories = (userData.categories || []).concat(category)
+      await userData.save()
+    }
+
     const link = await Link.create({
       linkUrl,
       category,
@@ -28,7 +37,6 @@ exports.addLink = async (req, res, next) => {
       userId: user._id,
     });
     const linkData = link.toClient();
-
     res.status(200).json({
       success: true,
       link: linkData,
@@ -73,7 +81,7 @@ exports.updateLink = async (req, res, next) => {
   const {
     params: { id },
     user,
-    body: { description },
+    body: { description, category },
   } = req;
 
   if (!mongoose.isValidObjectId(id)) {
@@ -88,13 +96,14 @@ exports.updateLink = async (req, res, next) => {
   try {
     const link = await Link.findOneAndUpdate(
       { _id: id, userId: user._id },
-      { $set: { description } },
+      { $set: { description, category } },
       { new: true }
     );
 
     if (!link) {
       return next(new ErrorResponse("No such link exists for updating", 404));
     }
+
     const linkData = link.toClient();
     res.status(200).json({
       success: true,
