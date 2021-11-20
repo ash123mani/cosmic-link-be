@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require('uuid');
 
 const Link = require("../models/Link");
 const User = require("../models/User");
@@ -26,7 +27,9 @@ exports.addLink = async (req, res, next) => {
     category = category.toLowerCase();
 
     if(!(userData.categories || []).includes(category)) {
-      userData.categories = (userData.categories || []).concat(category)
+      userData.categories = (userData.categories || []).concat({
+        name: category, id: uuidv4(), 
+      })
       await userData.save()
     }
 

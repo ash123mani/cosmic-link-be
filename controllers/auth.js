@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { v4: uuidv4 } = require('uuid');
 const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/sendEmail");
@@ -11,7 +12,11 @@ exports.register = async (req, res, next) => {
       username,
       email,
       password,
-      categories: ["articles", "music", "others"]
+      categories: [
+        { name: "Articles", id: uuidv4()}, 
+        { name: "Music", id: uuidv4()}, 
+        { name: "Others", id: uuidv4()}, 
+      ]
     });
 
     sendToken(user, 201, res);
@@ -51,14 +56,14 @@ exports.forgotpassword = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new ErrorResponse("Email could not be send", 404));
+      return next(new ErrorResponse("Resetpassword link could not be sent. Something not going good.", 404));
     }
 
     const resetToken = user.getResetPasswordToken();
 
     await user.save();
 
-    const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
+    const resetUrl = `http://localhost:8080/resetpassword/${resetToken}`;
 
     const message = `
       <h1>You have requested for password reset</h1>
@@ -75,13 +80,14 @@ exports.forgotpassword = async (req, res, next) => {
 
       res.status(200).json({
         success: true,
-        data: "Email sent successfully",
+        message: `We have sent an resetpassword link to  ${user.email}`,
+        email: user.email,
       });
     } catch (error) {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 
-      return next(new ErrorResponse("Email could not be sent", 500));
+      return next(new ErrorResponse("Resetpassword link could not be sent. Something not going good.", 500));
     }
   } catch (error) {
     next(error);
@@ -112,7 +118,7 @@ exports.resetpassword = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: "Password reset successful",
+      message: "Password reset successful, now login with your new password.",
     });
   } catch (error) {
     next(error);
