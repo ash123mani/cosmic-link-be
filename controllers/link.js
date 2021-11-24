@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require('uuid');
+const ogs = require('open-graph-scraper');
 
 const Link = require("../models/Link");
 const User = require("../models/User");
@@ -116,3 +117,20 @@ exports.updateLink = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getLinkMeta = async (req, res, next) => {
+  try {
+    const { url } = req.body
+    const data = await ogs({ url, timeout: 10000 })
+    const { error, result } = data;
+    if (error) {
+      return next(new ErrorResponse("Unable to get data"));
+    }
+    res.status(200).json({
+      success: true,
+      meta: result,
+    })
+  } catch(error) {
+    next(error);
+  }
+}
