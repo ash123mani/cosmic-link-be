@@ -5,6 +5,7 @@ const ogs = require('open-graph-scraper');
 const Link = require("../models/Link");
 const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
+const parseLinkMeta = require('../parser/link')
 
 //get
 
@@ -123,12 +124,15 @@ exports.getLinkMeta = async (req, res, next) => {
     const { url } = req.body
     const data = await ogs({ url, timeout: 10000 })
     const { error, result } = data;
+    
     if (error) {
       return next(new ErrorResponse("Unable to get data"));
     }
+
+    const parsedResult = parseLinkMeta(result)
     res.status(200).json({
       success: true,
-      meta: result,
+      meta: parsedResult,
     })
   } catch(error) {
     next(error);
