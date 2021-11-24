@@ -9,6 +9,6 @@ router.route("/:id").delete(protect, deleteLink)
 
 router.route("/:id").patch(protect, updateLink)
 
-router.route("/meta").get(getLinkMeta)
+router.route("/meta").post(getLinkMeta)
 
 module.exports = router;
