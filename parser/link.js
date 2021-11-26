@@ -16,7 +16,7 @@ const parseLinkMeta = (meta = {}) => {
     siteName: ogSiteName || twitterSite,
     title: ogTitle || twitterTitle,
     description: ogDescription || twitterDescription,
-    url: requestUrl,
+    linkUrl: requestUrl,
     imageUrl: ogImageUrl || twitterImageUrl,
   };
 

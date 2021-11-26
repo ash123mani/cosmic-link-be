@@ -12,17 +12,16 @@ const parseLinkMeta = require("../parser/link");
 exports.addLink = async (req, res, next) => {
   let {
     user,
-    body: { linkUrl, category, description },
+    body: {
+      linkUrl,
+      category,
+      title,
+      description,
+      category,
+      imageUrl,
+      siteName,
+    },
   } = req;
-
-  if (!linkUrl || !category) {
-    return next(
-      new ErrorResponse(
-        `Please enter a valid ${!linkUrl ? "url" : "category"}`,
-        500
-      )
-    );
-  }
 
   try {
     const userData = await User.findById(user._id);
@@ -41,6 +40,9 @@ exports.addLink = async (req, res, next) => {
       category,
       description,
       userId: user._id,
+      title,
+      imageUrl,
+      siteName,
     });
     const linkData = link.toClient();
     res.status(200).json({
@@ -122,8 +124,8 @@ exports.updateLink = async (req, res, next) => {
 
 exports.getLinkMeta = async (req, res, next) => {
   try {
-    const { url } = req.body;
-    const data = await ogs({ url, timeout: 10000 });
+    const { linkUrl } = req.body;
+    const data = await ogs({ url: linkUrl, timeout: 10000 });
     const { error, result } = data;
 
     if (error) {
