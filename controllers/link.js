@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require("uuid");
 const ogs = require("open-graph-scraper");
 
 const Link = require("../models/Link");
-const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 const parseLinkMeta = require("../parser/link");
 
@@ -14,7 +13,6 @@ exports.addLink = async (req, res, next) => {
     user,
     body: {
       linkUrl,
-      category,
       title,
       description,
       category,
@@ -24,15 +22,10 @@ exports.addLink = async (req, res, next) => {
   } = req;
 
   try {
-    const userData = await User.findById(user._id);
-    category = category.toLowerCase();
-
-    if (!(userData.categories || []).includes(category)) {
-      userData.categories = (userData.categories || []).concat({
-        name: category,
-        id: uuidv4(),
-      });
-      await userData.save();
+    if(!category.name || !category.id) {
+      return next(
+        new ErrorResponse("Please add a valid category", 400)
+      );
     }
 
     const link = await Link.create({
