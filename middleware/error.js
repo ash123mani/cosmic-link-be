@@ -1,11 +1,11 @@
-const ErrorResponse = require('../utils/errorResponse');
+const ErrorResponse = require("../utils/errorResponse");
 
 const errorHandler = (err, req, res, next) => {
   let error = { ...err };
 
-  error.message = err.message
+  error.message = err.message;
 
-  console.log("err", err)
+  console.log("err", error);
 
   if (err.code === 11000) {
     const message = "Duplicate Field value error";
@@ -13,14 +13,15 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err.code === "ValidationError") {
-    const message = Object.keys(err.errors).map(value => value.message);
+    const message = Object.keys(err.errors).map((value) => value.message);
     error = new ErrorResponse(message, 400);
   }
 
   res.status(error.statusCode || 500).json({
     success: false,
-    error: error.message|| "Server Error"
-  })
-}
+    error: error.message || "Server Error",
+    statusCode: error.statusCode || 500,
+  });
+};
 
 module.exports = errorHandler;

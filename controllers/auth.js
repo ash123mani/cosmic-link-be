@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/sendEmail");
@@ -13,10 +13,10 @@ exports.register = async (req, res, next) => {
       email,
       password,
       categories: [
-        { name: "Articles", id: uuidv4()}, 
-        { name: "Music", id: uuidv4()}, 
-        { name: "Others", id: uuidv4()}, 
-      ]
+        { name: "Articles", id: uuidv4() },
+        { name: "Music", id: uuidv4() },
+        { name: "Others", id: uuidv4() },
+      ],
     });
 
     sendToken(user, 201, res);
@@ -56,7 +56,12 @@ exports.forgotpassword = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new ErrorResponse("Resetpassword link could not be sent. Something not going good.", 404));
+      return next(
+        new ErrorResponse(
+          "Resetpassword link could not be sent. Something not going good.",
+          404
+        )
+      );
     }
 
     const resetToken = user.getResetPasswordToken();
@@ -87,7 +92,12 @@ exports.forgotpassword = async (req, res, next) => {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 
-      return next(new ErrorResponse("Resetpassword link could not be sent. Something not going good.", 500));
+      return next(
+        new ErrorResponse(
+          "Resetpassword link could not be sent. Something not going good.",
+          500
+        )
+      );
     }
   } catch (error) {
     next(error);
@@ -127,7 +137,7 @@ exports.resetpassword = async (req, res, next) => {
 
 const sendToken = async (user, statusCode, res) => {
   const token = await user.getSignedToken();
-  const userData = await user.toClient()
+  const userData = await user.toClient();
   res.status(statusCode).json({
     success: true,
     token,

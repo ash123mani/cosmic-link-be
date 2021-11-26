@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require('uuid');
-const ogs = require('open-graph-scraper');
+const { v4: uuidv4 } = require("uuid");
+const ogs = require("open-graph-scraper");
 
 const Link = require("../models/Link");
 const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
-const parseLinkMeta = require('../parser/link')
+const parseLinkMeta = require("../parser/link");
 
 //get
 
@@ -25,14 +25,15 @@ exports.addLink = async (req, res, next) => {
   }
 
   try {
-    const userData = await User.findById(user._id)
+    const userData = await User.findById(user._id);
     category = category.toLowerCase();
 
-    if(!(userData.categories || []).includes(category)) {
+    if (!(userData.categories || []).includes(category)) {
       userData.categories = (userData.categories || []).concat({
-        name: category, id: uuidv4(), 
-      })
-      await userData.save()
+        name: category,
+        id: uuidv4(),
+      });
+      await userData.save();
     }
 
     const link = await Link.create({
@@ -121,20 +122,20 @@ exports.updateLink = async (req, res, next) => {
 
 exports.getLinkMeta = async (req, res, next) => {
   try {
-    const { url } = req.body
-    const data = await ogs({ url, timeout: 10000 })
+    const { url } = req.body;
+    const data = await ogs({ url, timeout: 10000 });
     const { error, result } = data;
-    
+
     if (error) {
       return next(new ErrorResponse("Unable to get data"));
     }
 
-    const parsedResult = parseLinkMeta(result)
+    const parsedResult = parseLinkMeta(result);
     res.status(200).json({
       success: true,
       meta: parsedResult,
-    })
-  } catch(error) {
+    });
+  } catch (error) {
     next(error);
   }
-}
+};

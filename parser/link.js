@@ -23,4 +23,4 @@ const parseLinkMeta = (meta = {}) => {
   return result;
 };
 
-module.exports = parseLinkMeta
+module.exports = parseLinkMeta;
