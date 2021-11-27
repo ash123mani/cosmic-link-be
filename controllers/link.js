@@ -11,21 +11,12 @@ const parseLinkMeta = require("../parser/link");
 exports.addLink = async (req, res, next) => {
   let {
     user,
-    body: {
-      linkUrl,
-      title,
-      description,
-      category,
-      imageUrl,
-      siteName,
-    },
+    body: { linkUrl, title, description, category, imageUrl, siteName },
   } = req;
 
   try {
-    if(!category.name || !category.id) {
-      return next(
-        new ErrorResponse("Please add a valid category", 400)
-      );
+    if (!category.name || !category.id) {
+      return next(new ErrorResponse("Please add a valid category", 400));
     }
 
     const link = await Link.create({
@@ -129,6 +120,33 @@ exports.getLinkMeta = async (req, res, next) => {
     res.status(200).json({
       success: true,
       meta: parsedResult,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getLinks = async (req, res, next) => {
+  let {
+    user,
+    params: { category },
+  } = req;
+  try {
+    let links = [];
+
+    if (category.toLowerCase() === "all") {
+      links = await Link.find({ userId: user._id });
+    } else {
+      links = await Link.find({
+        userId: user._id,
+        "category.id": category,
+      });
+    }
+
+    const cleanedLinks = links.map((link) => link.toClient())
+    res.status(200).json({
+      success: true,
+      links: cleanedLinks,
     });
   } catch (error) {
     next(error);
