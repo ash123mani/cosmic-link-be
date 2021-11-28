@@ -7,6 +7,12 @@ const sendEmail = require("../utils/sendEmail");
 exports.register = async (req, res, next) => {
   const { username, email, password } = req.body;
 
+  if (!username || !email || !password) {
+    return next(
+      new ErrorResponse("Please provide name, email and password", 400)
+    );
+  }
+
   try {
     const user = await User.create({
       username,
@@ -15,6 +21,7 @@ exports.register = async (req, res, next) => {
       categories: [
         { name: "Articles", id: uuidv4() },
         { name: "Music", id: uuidv4() },
+        { name: "Videos", id: uuidv4() },
         { name: "Others", id: uuidv4() },
       ],
     });

@@ -32,6 +32,7 @@ exports.addLink = async (req, res, next) => {
     res.status(200).json({
       success: true,
       link: linkData,
+      categoryId: category.id
     });
   } catch (error) {
     next(error);
@@ -134,7 +135,9 @@ exports.getLinks = async (req, res, next) => {
   try {
     let links = [];
 
-    if (category.toLowerCase() === "all") {
+    const isAll = category.toLowerCase() === "all"
+
+    if (isAll) {
       links = await Link.find({ userId: user._id });
     } else {
       links = await Link.find({
@@ -147,6 +150,7 @@ exports.getLinks = async (req, res, next) => {
     res.status(200).json({
       success: true,
       links: cleanedLinks,
+      categoryId: category
     });
   } catch (error) {
     next(error);
