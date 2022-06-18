@@ -32,7 +32,7 @@ exports.addLink = async (req, res, next) => {
     res.status(200).json({
       success: true,
       link: linkData,
-      categoryId: category.id
+      categoryId: category.id,
     });
   } catch (error) {
     next(error);
@@ -58,12 +58,14 @@ exports.deleteLink = async (req, res, next) => {
     });
 
     if (!link) {
-      return next(new ErrorResponse("No such link exists"), 404);
+      return next(new ErrorResponse("No such link exists", 404));
     }
 
+    const linkData = link.toClient();
     res.status(200).json({
       success: true,
       message: "Link delete successfully",
+      link: linkData,
     });
   } catch (error) {
     next(error);
@@ -110,6 +112,13 @@ exports.updateLink = async (req, res, next) => {
 exports.getLinkMeta = async (req, res, next) => {
   try {
     const { linkUrl } = req.body;
+    const expression =
+      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    const regex = new RegExp(expression);
+
+    if (!linkUrl || !linkUrl.match(regex)) {
+      return next(new ErrorResponse("Please add a valid link", 404));
+    }
     const data = await ogs({ url: linkUrl, timeout: 10000 });
     const { error, result } = data;
 
@@ -135,7 +144,7 @@ exports.getLinks = async (req, res, next) => {
   try {
     let links = [];
 
-    const isAll = category.toLowerCase() === "all"
+    const isAll = category.toLowerCase() === "all";
 
     if (isAll) {
       links = await Link.find({ userId: user._id });
@@ -146,11 +155,11 @@ exports.getLinks = async (req, res, next) => {
       });
     }
 
-    const cleanedLinks = links.map((link) => link.toClient())
+    const cleanedLinks = links.map((link) => link.toClient());
     res.status(200).json({
       success: true,
       links: cleanedLinks,
-      categoryId: category
+      categoryId: category,
     });
   } catch (error) {
     next(error);

@@ -3,8 +3,10 @@ const router = express.Router();
 
 const { protect } = require("../middleware/auth");
 
-const { getUserData } = require("../controllers/user");
+const { getUserData, addCategory } = require("../controllers/user");
 
 router.route("/").get(protect, getUserData);
+
+router.route("/category").put(protect, addCategory);
 
 module.exports = router;
