@@ -1,14 +1,16 @@
-require("dotenv").config({ path: "./config.env" });
+require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
 const responseHeaders = require("./middleware/resp-headers");
+// const cors = require("./middleware/cors")
 
 //Connect DB
 connectDB();
 
 const app = express();
 
+// app.use(cors)
 app.use(responseHeaders);
 app.use(express.json());
 
