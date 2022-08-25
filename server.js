@@ -16,6 +16,7 @@ app.use(express.json());
 app.use("/api/v1/auth", require("./routes/auth"));
 app.use("/api/v1/link", require("./routes/link"));
 app.use("/api/v1/user", require("./routes/user"));
+app.use('/healthcheck', require('./routes/healthcheck'));
 
 // Error Handler (Should be last piece of middleware)
 app.use(errorHandler);
