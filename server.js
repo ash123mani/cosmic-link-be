@@ -10,7 +10,6 @@ connectDB();
 
 const app = express();
 
-// app.use(cors)
 app.use(responseHeaders);
 app.use(express.json());
 
