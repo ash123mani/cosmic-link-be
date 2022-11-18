@@ -6,6 +6,13 @@ const sendEmail = require("../utils/sendEmail");
 
 exports.register = async (req, res, next) => {
   const { username, email, password } = req.body;
+  const user = await User.findOne({ email });
+
+  if (user) {
+    return next(
+      new ErrorResponse("User already exist with this email", 400)
+    );
+  }
 
   if (!username || !email || !password) {
     return next(

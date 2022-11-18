@@ -20,9 +20,10 @@ exports.getUserData = async (req, res, next) => {
 exports.addCategory = async (req, res, next) => {
   try {
     const {
-      user: { _id: userId },
+      user: { _id },
       body: { name },
     } = req;
+    console.log("user", req.user)
 
     if (!name || (name && name.length < 3)) {
       return next(
@@ -34,7 +35,7 @@ exports.addCategory = async (req, res, next) => {
     }
 
     const user = await User.findOneAndUpdate(
-      { userId },
+      { _id },
       {
         $push: {
           categories: {
