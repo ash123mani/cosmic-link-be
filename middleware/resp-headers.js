@@ -8,6 +8,10 @@ const responseHeaders = (req, res, next) => {
     "Access-Control-Allow-Headers",
     "X-Requested-With,content-type,Authorization"
   );
+  res.setHeader(
+    'Access-Control-Allow-Private-Network',
+    true
+  )
 
   next();
 };
