@@ -5,9 +5,9 @@ const ogs = require("open-graph-scraper");
 const Link = require("../models/Link");
 const ErrorResponse = require("../utils/errorResponse");
 const parseLinkMeta = require("../parser/link");
+const patterns = require('../utils/patterns')
 
 //get
-
 exports.addLink = async (req, res, next) => {
   let {
     user,
@@ -112,18 +112,18 @@ exports.updateLink = async (req, res, next) => {
 exports.getLinkMeta = async (req, res, next) => {
   try {
     const { linkUrl } = req.body;
-    const expression =
-      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-    const regex = new RegExp(expression);
+    const { urlRegex } = patterns
+    const regex = new RegExp(urlRegex);
 
     if (!linkUrl || !linkUrl.match(regex)) {
-      return next(new ErrorResponse("Please add a valid link", 404));
+      return next(new ErrorResponse("Please add a valid link", 400));
     }
+
     const data = await ogs({ url: linkUrl, timeout: 10000 });
     const { error, result } = data;
-
+    
     if (error) {
-      return next(new ErrorResponse("Unable to get data"));
+      return next(new ErrorResponse("Unable to get link meta data"));
     }
 
     const parsedResult = parseLinkMeta(result);

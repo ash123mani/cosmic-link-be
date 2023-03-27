@@ -23,7 +23,6 @@ exports.addCategory = async (req, res, next) => {
       user: { _id },
       body: { name },
     } = req;
-    console.log("user", req.user)
 
     if (!name || (name && name.length < 3)) {
       return next(
@@ -56,6 +55,39 @@ exports.addCategory = async (req, res, next) => {
       success: true,
       user: userData,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteCategory = async (req, res, next) => {
+  try {
+    const {
+      user,
+      params: { id },
+    } = req;
+    const { categories, _id } = user
+
+    if (categories.length === 1) {
+      return next(new ErrorResponse("You cannot delete the last category"));
+    }
+
+    const query = await User.updateOne(
+      { _id },
+      { $pull: { categories: { id } } }
+    );
+
+    if (!query.modifiedCount) {
+      return next(new ErrorResponse("No such category exits", 404));
+    }
+
+    const updateUserData = await User.findById(_id);
+    const userData = updateUserData.toClient();
+    res.status(200).json({
+      success: true,
+      user: userData,
+    });
+
   } catch (error) {
     next(error);
   }
